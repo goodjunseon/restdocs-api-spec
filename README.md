@@ -1,4 +1,4 @@
-# Spring REST Docs API specification Integration
+# Spring REST Docs API 명세 통합
 
 [![oss lifecycle](https://img.shields.io/badge/oss_lifecycle-maintenance-yellow.svg)](https://github.com/ePages-de/restdocs-api-spec/issues/204)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ePages-de_restdocs-api-spec&metric=coverage)](https://sonarcloud.io/summary/new_code?id=ePages-de_restdocs-api-spec)
@@ -6,133 +6,107 @@
 [![Maven Central](https://img.shields.io/maven-central/v/com.epages/restdocs-api-spec)](https://search.maven.org/artifact/com.epages/restdocs-api-spec)
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/restdocs-api-spec/Lobby)
 
-This is an extension that adds API specifications as an output format to [Spring REST Docs](https://projects.spring.io/spring-restdocs/).
-It currently supports:
-- [OpenAPI 2.0](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md) in `json` and `yaml`
-- [OpenAPI 3.0.1](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md) in `json` and `yaml`
+이 프로젝트는 [Spring REST Docs](https://projects.spring.io/spring-restdocs/)의 출력 포맷에 API 명세를 추가하는 확장입니다.  
+현재 지원하는 포맷은 다음과 같습니다:
+- [OpenAPI 2.0](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md) (json, yaml)
+- [OpenAPI 3.0.1](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md) (json, yaml)
 - [Postman Collections 2.1.0](https://schema.getpostman.com/json/collection/v2.1.0/docs/index.html)
 
-Please note that this extension was developed for JSON-based APIs.
-We do not expect this extension to build usable API specification for non-JSON request or response bodies.
+> ⚠️ 이 확장은 JSON 기반 API용으로 개발되었습니다.  
+> JSON이 아닌 요청/응답 본문에 대해서는 사용 가능한 API 명세가 생성되지 않을 수 있습니다.
 
-## Motivation
+## 동기
 
-[Spring REST Docs](https://projects.spring.io/spring-restdocs/) is a great tool to produce documentation for your RESTful services that is accurate and readable.
+[Spring REST Docs](https://projects.spring.io/spring-restdocs/)는 RESTful 서비스의 정확하고 읽기 쉬운 문서를 만들어주는 훌륭한 도구입니다.
 
-We especially like its test-driven approach and this is the main reason why we chose it.
+우리는 특히 테스트 주도 방식이 마음에 들어서 이 도구를 선택했습니다.
 
-It offers support for AsciiDoc and Markdown. This is great for generating simple HTML-based documentation.
-But both are markup languages and thus it is hard to get any further than statically generated HTML.
+AsciiDoc과 Markdown을 지원하여 HTML 기반 문서를 쉽게 생성할 수 있습니다.  
+하지만 이들은 마크업 언어이기 때문에 정적으로 생성된 HTML 이상의 것을 얻기 어렵습니다.
 
-API specifications like OpenAPI are a lot more flexible.
-With e.g. OpenAPI you get a machine-readable description of your API. There is a rich ecosystem around it that contains tools to:
-- generate a HTML representation of your API - [ReDoc](https://github.com/Rebilly/ReDoc)
-- generate an interactive API reference - e.g. using services like [stoplight.io](https://stoplight.io) or [readme.io](https://readme.io)
+OpenAPI 같은 API 명세는 훨씬 더 유연합니다.  
+예를 들어 OpenAPI를 사용하면 API를 기계가 읽을 수 있는 형태로 기술할 수 있으며,  
+이를 바탕으로 한 다양한 도구(예: [ReDoc](https://github.com/Rebilly/ReDoc), [stoplight.io](https://stoplight.io), [readme.io](https://readme.io))가 존재합니다.
 
-Also, API specifications like OpenAPI are supported by many REST clients like [Postman](https://www.getpostman.com) and [Paw](https://paw.cloud).
-Thus having an API specification for a REST API is a great plus when starting to work with it.
+또한 OpenAPI와 같은 명세는 [Postman](https://www.getpostman.com), [Paw](https://paw.cloud)와 같은 많은 REST 클라이언트에서도 지원됩니다.  
+따라서 REST API에 대한 명세를 갖추는 것은 큰 이점입니다.
 
-The most common use case to generate an OpenAPI specification is code introspection and adding documentation related annotations to your code.
-We do not like enriching our production code with this information and clutter it with even more annotations.
-We agree with Spring REST Docs that the test-driven way to produce accurate API documentation is the way to go.
-This is why we came up with this project.
+대부분의 경우 OpenAPI 명세는 코드 인트로스펙션과 주석(annotation) 기반으로 생성됩니다.  
+하지만 우리는 프로덕션 코드에 문서 관련 주석을 추가하여 코드를 더 복잡하게 만드는 방식을 선호하지 않습니다.  
+테스트 기반 문서화가 더 정확하다고 생각하며, 그것이 바로 이 프로젝트를 만든 이유입니다.
 
+## 목차
 
-- [Motivation](#motivation)
-- [Getting started](#getting-started)
-    - [Version compatibility](#version-compatibility)
-    - [Project structure](#project-structure)
-    - [Build configuration](#build-configuration)
+- [동기](#동기)
+- [시작하기](#시작하기)
+    - [버전 호환성](#버전-호환성)
+    - [프로젝트 구조](#프로젝트-구조)
+    - [빌드 설정](#빌드-설정)
         - [Gradle](#gradle)
         - [Maven](#maven)
-    - [Usage with Spring REST Docs](#usage-with-spring-rest-docs)
-    - [Documenting Bean Validation constraints](#documenting-bean-validation-constraints)
-    - [Migrate existing Spring REST Docs tests](#migrate-existing-spring-rest-docs-tests)
-        - [MockMvc based tests](#mockmvc-based-tests)
-        - [REST Assured based tests](#rest-assured-based-tests)
-        - [WebTestClient based tests](#webtestclient-based-tests)
-    - [Security Definitions in OpenAPI](#security-definitions-in-openapi)
-    - [Running the gradle plugin](#running-the-gradle-plugin)
-        - [OpenAPI 2.0](#openapi-20)
-        - [OpenAPI 3.0.1](#openapi-301)
-        - [Postman](#postman)
-    - [Gradle plugin configuration](#gradle-plugin-configuration)
-        - [Common configuration for all formats](#common-configuration-for-all-formats)
-        - [Common OpenAPI configuration](#common-openapi-configuration)
-        - [OpenAPI 2.0](#openapi-20-1)
-        - [OpenAPI 3.0.1](#openapi-301-1)
-        - [Postman](#postman-1)
-- [Generate an HTML-based API reference from OpenAPI](#generate-an-html-based-api-reference-from-openapi)
+    - [Spring REST Docs와의 사용법](#spring-rest-docs와의-사용법)
+    - [Bean Validation 제약 문서화](#bean-validation-제약-문서화)
+    - [기존 Spring REST Docs 테스트 마이그레이션](#기존-spring-rest-docs-테스트-마이그레이션)
+    - [OpenAPI의 보안 정의](#openapi의-보안-정의)
+    - [Gradle 플러그인 실행](#gradle-플러그인-실행)
+    - [Gradle 플러그인 설정](#gradle-플러그인-설정)
+- [OpenAPI로부터 HTML API 레퍼런스 생성](#openapi로부터-html-api-레퍼런스-생성)
 
-## Getting started
+## 시작하기
 
-### Version compatibility
+### 버전 호환성
 
-Spring Boot and Spring REST Docs 3.0.0 introduced [breaking chances to how request parameters are documented: `RequestParameterSnippet` was split into `QueryParameterSnippet` and `FormParameterSnippet`.](https://github.com/spring-projects/spring-restdocs/issues/832)
+Spring Boot 및 Spring REST Docs 3.0.0에서는 [RequestParameterSnippet이 QueryParameterSnippet과 FormParameterSnippet으로 분리](https://spring.io/blog/2022/11/24/spring-rest-docs-3-0-0-released)되는 등 변경점이 있습니다.
 
-|Spring Boot version | restdocs-api-spec version|
+|Spring Boot 버전 | restdocs-api-spec 버전|
 |---|---|
-|3.x|0.17.1 or later|
+|3.x|0.17.1 이상|
 |2.x|0.16.4|
 
-### Project structure
+### 프로젝트 구조
 
-The project consists of the following main components:
+- **restdocs-api-spec** - 실제 Spring REST Docs 확장 기능을 포함합니다.  
+  테스트에서 사용하는 [ResourceDocumentation](restdocs-api-spec/src/main/kotlin/com/epages/restdocs/apispec/ResourceDocumentation.kt)이 진입점입니다.
+- **restdocs-api-spec-mockmvc** - MockMvc 기반 테스트에서 쉽게 마이그레이션할 수 있게 도와주는 래퍼입니다.
+- **restdocs-api-spec-restassured** - Rest Assured 기반 테스트에서 쉽게 마이그레이션할 수 있게 도와주는 래퍼입니다.
+- **restdocs-api-spec-gradle-plugin** - `resource.json` 파일을 API 명세 파일로 집계해주는 Gradle 플러그인입니다.
 
-- [restdocs-api-spec](restdocs-api-spec) - contains the actual Spring REST Docs extension.
-This is most importantly the [ResourceDocumentation](restdocs-api-spec/src/main/kotlin/com/epages/restdocs/apispec/ResourceDocumentation.kt) which is the entry point to use the extension in your tests.
-The [ResourceSnippet](restdocs-api-spec/src/main/kotlin/com/epages/restdocs/apispec/ResourceSnippet.kt) is the snippet used to produce a json file `resource.json` containing all the details about the documented resource.
-- [restdocs-api-spec-mockmvc](restdocs-api-spec-mockmvc) - contains a wrapper for `MockMvcRestDocumentation` for easier migration to `restdocs-api-spec` from MockMvc tests that use plain `spring-rest-docs-mockmvc`.
-- [restdocs-api-spec-restassured](restdocs-api-spec-restassured) - contains a wrapper for `RestAssuredRestDocumentation` for easier migration to `restdocs-api-spec` from [Rest Assured](http://rest-assured.io) tests that use plain `spring-rest-docs-restassured`.
-- [restdocs-api-spec-gradle-plugin](restdocs-api-spec-gradle-plugin) - adds a gradle plugin that aggregates the `resource.json` files produced  by `ResourceSnippet` into an API specification file for the whole project.
-
-### Build configuration
+### 빌드 설정
 
 #### Gradle
 
-1. Add the plugin
-    * Using the [plugins DSL](https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block):
+1. 플러그인 추가
+    - plugins DSL 사용:
         ```groovy
         plugins {
             id 'com.epages.restdocs-api-spec' version '0.18.2'
         }
         ```
-        Examples with Kotlin are also available [here](https://plugins.gradle.org/plugin/com.epages.restdocs-api-spec)
-    * __OR__ Using [legacy plugin application](https://docs.gradle.org/current/userguide/plugins.html#sec:old_plugin_application):
-        * *1.1* Use of `buildscript` requires you to add the `https://plugins.gradle.org/m2/` repository.
-        * *1.2* add the dependency to `restdocs-api-spec-gradle-plugin`
-        * *1.3* apply `restdocs-api-spec-gradle-plugin`
+    - 레거시 플러그인 적용:
         ```groovy
         buildscript {
           repositories {
             maven {
-              url "https://plugins.gradle.org/m2/" //1.1
+              url "https://plugins.gradle.org/m2/"
             }
           }
           dependencies {
-            classpath "com.epages:restdocs-api-spec-gradle-plugin:0.18.2" //1.2
+            classpath "com.epages:restdocs-api-spec-gradle-plugin:0.18.2"
           }
         }
-
-        apply plugin: 'com.epages.restdocs-api-spec' //1.3
-
+        apply plugin: 'com.epages.restdocs-api-spec'
         ```
-2. Add required dependencies to your tests
-    * *2.1* add the `mavenCentral` repository used to resolve the `com.epages:restdocs-api-spec` module of the project.
-    * *2.2* add the actual `restdocs-api-spec-mockmvc` dependency to the test scope. Use `restdocs-api-spec-restassured` if you use `RestAssured` instead of `MockMvc`.
-    * *2.3* add configuration options for `restdocs-api-spec-gradle-plugin`. See [Gradle plugin configuration](#gradle-plugin-configuration)
+2. 테스트에 필요한 의존성 추가
     ```groovy
-
-    repositories { //2.1
+    repositories {
         mavenCentral()
     }
 
     dependencies {
-        //..
-        testImplementation('com.epages:restdocs-api-spec-mockmvc:0.18.2') //2.2
+        testImplementation('com.epages:restdocs-api-spec-mockmvc:0.18.2')
     }
 
-    openapi { //2.3
+    openapi {
         host = 'localhost:8080'
         basePath = '/api'
         title = 'My API'
@@ -157,19 +131,18 @@ The [ResourceSnippet](restdocs-api-spec/src/main/kotlin/com/epages/restdocs/apis
         baseUrl = 'https://localhost:8080'
     }
     ```
-
-See the [build.gradle](samples/restdocs-api-spec-sample/build.gradle) for the setup used in the sample project.
+> 샘플 프로젝트의 [build.gradle](samples/restdocs-api-spec-sample/build.gradle) 참고
 
 #### Maven
 
-The root project does not provide a maven plugin.
-But you can find a plugin that works with `restdocs-api-spec` at [BerkleyTechnologyServices/restdocs-spec](https://github.com/BerkleyTechnologyServices/restdocs-spec).
+루트 프로젝트에서는 별도의 Maven 플러그인을 제공하지 않습니다.  
+[Maven 플러그인 예시](https://github.com/BerkleyTechnologyServices/restdocs-spec)를 참고하세요.
 
-### Usage with Spring REST Docs
+### Spring REST Docs와의 사용법
 
-The class [ResourceDocumentation](restdocs-api-spec/src/main/kotlin/com/epages/restdocs/apispec/ResourceDocumentation.kt) contains the entry point for using the [ResourceSnippet](restdocs-api-spec/src/main/kotlin/com/epages/restdocs/apispec/ResourceSnippet.kt).
+테스트 코드에서 [ResourceDocumentation](restdocs-api-spec/src/main/kotlin/com/epages/restdocs/apispec/ResourceDocumentation.kt)의 `resource` 메서드를 사용합니다.
 
-The most basic form does not take any parameters:
+가장 단순한 형태는 다음과 같습니다:
 
 ```java
 mockMvc
@@ -177,143 +150,72 @@ mockMvc
   .andDo(document("carts-create", resource("Create a cart")));
 ```
 
-This test will produce the `resource.json` file in the snippets directory.
-This file just contains all the information that we can collect about the resource.
-The format of this file is not specific to an API specification.
+이 테스트는 스니펫 디렉토리에 `resource.json` 파일을 생성합니다.  
+이 파일에는 리소스에 대한 모든 정보가 담깁니다.
 
 ```json
 {
   "operationId" : "carts-create",
   "summary" : "Create a cart",
   "description" : "Create a cart",
-  "privateResource" : false,
-  "deprecated" : false,
-  "request" : {
-    "path" : "/carts",
-    "method" : "POST",
-    "contentType" : null,
-    "headers" : [ ],
-    "pathParameters" : [ ],
-    "requestParameters" : [ ],
-    "requestFields" : [ ],
-    "example" : null,
-    "securityRequirements" : null
-  },
-  "response" : {
-    "status" : 201,
-    "contentType" : "application/hal+json",
-    "headers" : [ ],
-    "responseFields" : [ ],
-    "example" : "{\n  \"total\" : 0,\n  \"products\" : [ ],\n  \"_links\" : {\n    \"self\" : {\n      \"href\" : \"http://localhost:8080/carts/4\"\n    },\n    \"order\" : {\n      \"href\" : \"http://localhost:8080/carts/4/order\"\n    }\n  }\n}"
-  }
+  ...
 }
 ```
 
-Just like with Spring REST Docs we can also describe request fields, response fields, path variables, parameters, headers, and links.
-Furthermore you can add a text description and a summary for your resource.
-The extension also discovers `JWT` tokens in the `Authorization` header and will document the required scopes from it. Also basic auth headers are discovered and documented.
+Spring REST Docs와 마찬가지로 요청 필드, 응답 필드, 경로 변수, 파라미터, 헤더, 링크 등도 문서화할 수 있습니다.  
+또한 리소스에 대한 설명과 요약도 추가할 수 있습니다.  
+확장 기능은 `Authorization` 헤더의 JWT 토큰을 분석해 필요한 스코프도 문서화할 수 있습니다. 기본 인증 헤더도 자동으로 인식하여 문서화합니다.
 
-The following example uses `ResourceSnippetParameters` to document response fields, path parameters, and links.
-We paid close attention to keep the API as similar as possible to what you already know from Spring REST Docs.
-`fieldWithPath` and `linkWithRel` are actually still the static methods you would use in your using Spring REST Docs test.
+자세한 예시는 [CartIntegrationTest](samples/restdocs-api-spec-sample/src/test/java/com/epages/restdocs/apispec/sample/CartIntegrationTest.java)를 참고하세요.
 
-```java
-mockMvc.perform(get("/carts/{id}", cartId)
-  .accept(HAL_JSON))
-  .andExpect(status().isOk())
-  .andDo(document("cart-get",
-    resource(ResourceSnippetParameters.builder()
-      .description("Get a cart by id")
-      .pathParameters(
-        parameterWithName("id").description("the cart id"))
-      .responseFields(
-        fieldWithPath("total").description("Total amount of the cart."),
-        fieldWithPath("products").description("The product line item of the cart."),
-        subsectionWithPath("products[]._links.product").description("Link to the product."),
-        fieldWithPath("products[].quantity").description("The quantity of the line item."),
-        subsectionWithPath("products[].product").description("The product the line item relates to."),
-        subsectionWithPath("_links").description("Links section."))
-      .links(
-        linkWithRel("self").ignored(),
-        linkWithRel("order").description("Link to order the cart."))
-    .build())));
-```
-Please see the [CartIntegrationTest](samples/restdocs-api-spec-sample/src/test/java/com/epages/restdocs/apispec/sample/CartIntegrationTest.java) in the sample application for a detailed example.
+> **주의: 경로 변수는 템플릿 URI로 작성해야 합니다.**
+> 
+> 예시:
+> ```java
+> mockMvc.perform(get("/carts/{id}", cartId)
+> ```
 
-**:warning: Use `template URIs` to refer to path variables in your request**
+### Bean Validation 제약 문서화
 
-Note how we use the `urlTemplate` to build the request with [`RestDocumentationRequestBuilders`](https://docs.spring.io/spring-restdocs/docs/current/api/org/springframework/restdocs/mockmvc/RestDocumentationRequestBuilders.html#get-java.lang.String-java.lang.Object...-).
-This makes the `urlTemplate` available in the snippet and we can depend on the non-expanded template when generating the OpenAPI file.
+Spring REST Docs처럼 [bean validation constraints](https://docs.spring.io/spring-restdocs/docs/current/reference/html5/#documenting-your-api-constraints)를 활용하여 필드의 제약 조건을 문서화할 수 있습니다.  
+`restdocs-api-spec`의 [ConstrainedFields](restdocs-api-spec/src/main/kotlin/com/epages/restdocs/apispec/ConstrainedFields.kt)를 사용하세요.
 
- ```java
-mockMvc.perform(get("/carts/{id}", cartId)
- ```
+지원되는 제약 조건 예시:
+- `NotNull`, `NotEmpty`, `NotBlank`: 필수 필드로 처리
+- `Length`: minLength, maxLength 값 반영
+- `Pattern`: 정규식 패턴 반영
+- `Min`, `Max`, `Size`: 숫자 필드의 최소/최대값 반영
 
-### Documenting Bean Validation constraints
+직접 구현한 ConstrainedFields가 있다면, `FieldDescriptor`의 attributes map에 `validationConstraints` 키로 제약 정보를 추가하면 됩니다.
 
-Similar to the way Spring REST Docs allows to use [bean validation constraints](https://docs.spring.io/spring-restdocs/docs/current/reference/html5/#documenting-your-api-constraints) to enhance your documentation, you can also use the constraints from your model classes to let `restdocs-api-spec` enrich the generated JsonSchemas.
-`restdocs-api-spec` provides the class [com.epages.restdocs.apispec.ConstrainedFields](restdocs-api-spec/src/main/kotlin/com/epages/restdocs/apispec/ConstrainedFields.kt) to generate `FieldDescriptor`s that contain information about the constraints on this field.
+### 기존 Spring REST Docs 테스트 마이그레이션
 
-Currently the following constraints are considered when generating JsonSchema from `FieldDescriptor`s that have been created via `com.epages.restdocs.apispec.ConstrainedFields`
-- `NotNull`, `NotEmpty`, and `NotBlank` annotated fields become required fields in the JsonSchema
-- for String fields annotated with `NotEmpty`, and `NotBlank` the `minLength` constraint in JsonSchema is set to 1
-- for String fields annotated with `Length` the `minLength` and `maxLength` constraints in JsonSchema are set to the value of the corresponding attribute of the annotation
-- for String fields annotated with `Pattern`, the pattern constraint is propagated to JsonSchema
-- for Number fields annotated with `Min`, the `minimum` constraint is propagated to JsonSchema
-- for Number fields annotated with `Max`, the `maximum` constraint is propagated to JsonSchema
-- for Number fields annotated with `Size` the `minimum` and `maximum` constraints in JsonSchema are set to the value of the corresponding attribute of the annotation
+#### MockMvc 기반 테스트
 
-If you already have your own `ConstraintFields` implementation you can also add the logic from `com.epages.restdocs.apispec.ConstrainedFields` to your own class.
-Here it is important to add the constraints under the key `validationConstraints` into the attributes map if the `FieldDescriptor`.
+`MockMvcRestDocumentationWrapper.document`를 사용하면 기존 Spring REST Docs의 `MockMvcRestDocumentation.document`를 대체할 수 있습니다.
 
-### Migrate existing Spring REST Docs tests
-
-#### MockMvc based tests
-
-For convenience when applying `restdocs-api-spec` to an existing project that uses Spring REST Docs, we introduced [com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper](restdocs-api-spec-mockmvc/src/main/kotlin/com/epages/restdocs/apispec/MockMvcRestDocumentationWrapper.kt).
-
-In your tests you can just replace calls to `MockMvcRestDocumentation.document` with the corresponding variant of `MockMvcRestDocumentationWrapper.document`.
-
-`MockMvcRestDocumentationWrapper.document` will execute the specified snippets and also add a `ResourceSnippet` equipped with the input from your snippets.
-
-Here is an example:
-
+예시:
 ```java
 resultActions
   .andDo(
     MockMvcRestDocumentationWrapper.document(operationName,
-      requestFields(new FieldDescriptors().getFieldDescriptors()),
-      responseFields(
-        fieldWithPath("comment").description("the comment"),
-        fieldWithPath("flag").description("the flag"),
-        fieldWithPath("count").description("the count"),
-        fieldWithPath("id").description("id"),
-        fieldWithPath("_links").ignored()
-      ),
-      links(linkWithRel("self").description("some"))
+      requestFields(...),
+      responseFields(...),
+      links(...)
   )
 );
 ```
 
-This will do exactly what `MockMvcRestDocumentation.document` does.
-Additionally it will add a `ResourceSnippet` with the descriptors you provided in the `RequestFieldsSnippet`, `ResponseFieldsSnippet`, and `LinksSnippet`.
+#### REST Assured 기반 테스트
 
-#### REST Assured based tests
-
-Also for REST Assured we offer a convenience wrapper similar to `MockMvcRestDocumentationWrapper`.
-The usage for REST Assured is also similar to MockMVC, except that [com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper](restdocs-api-spec/src/main/kotlin/com/epages/restdocs/apispec/RestAssuredRestDocumentationWrapper.kt) is used instead of [com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper](restdocs-api-spec/src/main/kotlin/com/epages/restdocs/apispec/MockMvcRestDocumentationWrapper.kt).
-
-To use the `RestAssuredRestDocumentationWrapper`, you have to add a dependency to [restdocs-api-spec-restassured](restdocs-api-spec-restassured) to your build.
+`RestAssuredRestDocumentationWrapper.document`를 사용하세요.  
+예시:
 ```java
 RestAssured.given(this.spec)
         .filter(RestAssuredRestDocumentationWrapper.document("{method-name}",
-                "The API description",
-                requestParameters(
-                        parameterWithName("param").description("the param")
-                ),
-                responseFields(
-                        fieldWithPath("doc.timestamp").description("Creation timestamp")
-                )
+                "API 설명",
+                requestParameters(...),
+                responseFields(...)
         ))
         .when()
         .queryParam("param", "foo")
@@ -322,287 +224,120 @@ RestAssured.given(this.spec)
         .statusCode(200);
 ```
 
-#### WebTestClient based tests
+#### WebTestClient 기반 테스트
 
-We also offer a convenience wrapper for `WebTestClient` which works similar to `MockMvcRestDocumentationWrapper`.
-The usage is similar to MockMVC, except that [com.epages.restdocs.apispec.WebTestClientRestDocumentationWrapper](restdocs-api-spec-webtestclient/src/main/kotlin/com/epages/restdocs/apispec/WebTestClientRestDocumentationWrapper.kt) is used instead of [com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper](restdocs-api-spec/src/main/kotlin/com/epages/restdocs/apispec/MockMvcRestDocumentationWrapper.kt).
-
-To use the `WebTestClientRestDocumentationWrapper`, you will have to add a dependency to [restdocs-api-spec-webtestclient](restdocs-api-spec-webtestclient) to your build.
-
+`WebTestClientRestDocumentationWrapper.document`를 사용하세요.  
+예시:
 ```
 webTestClient.get().uri("/sample/{id}?queryParam=something", "1024").exchange()
     .expectStatus().isOk().expectBody()
     .consumeWith(
         WebTestClientRestDocumentationWrapper
             .document("sample",
-                RequestDocumentation.pathParameters(
-                    parameterWithName("id").description(
-                        "description of the path parameter")
-                ),
-                RequestDocumentation.requestParameters(
-                    parameterWithName("queryParam").description(
-                        "description of the query parameter")
-                ),
-                HeaderDocumentation.responseHeaders(
-                    headerWithName(HttpHeaders.CONTENT_TYPE)
-                        .description(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                ),
-                responseFields(
-                    PayloadDocumentation.fieldWithPath("field1").type(JsonFieldType.STRING)
-                        .description("description of field1"),
-                    PayloadDocumentation.fieldWithPath("field2").type(JsonFieldType.STRING)
-                        .description("description of field2")
-                )
+                ...
             )
     );
 ```
 
-### Security Definitions in OpenAPI
+### OpenAPI의 보안 정의
 
-The project has limited support for describing security requirements of an API.
-Currently we only support Oauth2 with [JWT](https://jwt.io/) tokens and HTTP Basic Auth.
+이 프로젝트는 OAuth2(JWT)와 HTTP Basic Auth에 대한 기본적인 보안 명세를 지원합니다.  
+`Authorization` 헤더의 JWT 토큰 또는 기본 인증 헤더를 분석해 필요한 스코프 정보를 추출하여 문서화합니다.
 
-`restdocs-api-spec` inspects the `AUTHORIZATION` header of a request for a `JWT` token.
-Also the a HTTP basic authorization header is discovered and documented.
-If such a token is found the scopes are extracted and added to the `resource.json` snippet.
+`restdocs-api-spec-gradle-plugin`의 `oauth2SecuritySchemeDefinition` 옵션을 사용하면 OpenAPI의 보안 정의가 생성됩니다.
 
-The `restdocs-api-spec-gradle-plugin` will consider this information if the `oauth2SecuritySchemeDefinition` configuration option is set (see [Gradle plugin configuration](#gradle-plugin-configuration)).
-This will result in a top-level `securityDefinitions` in the OpenAPI definition.
-Additionally the required scopes will be added in the `security` section of an `operation`.
+### Gradle 플러그인 실행
 
-### Running the gradle plugin
+API 명세 파일을 생성하려면 다음과 같이 Gradle 태스크를 실행하세요.
 
-`restdocs-api-spec-gradle-plugin` is responsible for picking up the generated `resource.json` files and aggregate them into an API specification.
+- **OpenAPI 2.0**
+    ```
+    ./gradlew openapi
+    ```
+- **OpenAPI 3.0.1**
+    ```
+    ./gradlew openapi3
+    ```
+    결과물: `build/api-spec/openapi3.yaml`
 
-#### OpenAPI 2.0
-In order to generate an OpenAPI 2.0 specification we use the `openapi` task:
+- **Postman**
+    ```
+    ./gradlew postman
+    ```
+    결과물: `build/api-spec/postman-collection.json`
 
-```
-./gradlew openapi
-```
+### Gradle 플러그인 설정
 
-#### OpenAPI 3.0.1
-In order to generate an OpenAPI 3.0.1 specification we use the `openapi3` task:
+#### 공통 설정
 
-```
-./gradlew openapi3
-```
+|이름|설명|기본값|
+|----|---|---|
+|separatePublicApi|비공개 리소스를 제외한 별도의 명세 파일도 생성할지 여부|false|
+|outputDirectory|API 명세 파일 출력 디렉토리|build/api-spec|
+|snippetsDirectory|Spring REST Docs 스니펫 디렉토리|build/generated-snippets|
 
-For our [sample project](samples/restdocs-api-spec-sample) this creates a `openapi3.yaml` file in the output directory (`build/api-spec`).
+#### OpenAPI 공통 설정
 
-### Postman
+|이름|설명|기본값|
+|----|---|---|
+|title|애플리케이션 제목|API documentation|
+|description|애플리케이션 설명|빈값|
+|version|API 버전|프로젝트 버전|
+|format|json 또는 yaml|json|
+|tagDescriptionsPropertiesFile|태그 설명 매핑 yaml 파일|없음|
+|oauth2SecuritySchemeDefinition|보안 정의 설정 클로저|없음|
 
-In order to generate a [Postman collection](https://www.getpostman.com/collection) we use the `postman` task:
+#### OpenAPI 2.0 전용 설정
 
-```
-./gradlew postman
-```
+|이름|설명|기본값|
+|----|---|---|
+|host|API 서버 호스트|없음|
+|basePath|API 기본 경로|없음|
+|schemes|지원 프로토콜|없음|
+|outputFileNamePrefix|출력 파일 접두사|openapi|
 
-For our [sample project](samples/restdocs-api-spec-sample) this creates a `postman-collection.json` file in the output directory (`build/api-spec`).
+#### OpenAPI 3.0.1 전용 설정
 
-### Gradle plugin configuration
+|이름|설명|기본값|
+|----|---|---|
+|outputFileNamePrefix|출력 파일 접두사|openapi3|
+|servers|여러 서버 정의|http://localhost|
+|server|단일 서버 정의|http://localhost|
 
-#### Common configuration for all formats
+#### Postman 전용 설정
 
-Name | Description | Default value
----- | ----------- | -------------
-separatePublicApi | Should the plugin generate additional API specification files which do **not** contain the resources marked as private | `false`
-outputDirectory | The output directory for the API specification files | `build/api-spec`
-snippetsDirectory | The directory Spring REST Docs generated the snippets to | `build/generated-snippets`
+|이름|설명|기본값|
+|----|---|---|
+|title|컬렉션 이름|API documentation|
+|version|컬렉션 버전|프로젝트 버전 또는 1.0.0|
+|baseUrl|기본 URL|http://localhost|
 
-#### Common OpenAPI configuration
+## OpenAPI로부터 HTML API 레퍼런스 생성
 
-The `restdocs-api-spec-gradle-plugin` takes the following configuration options for OpenAPI 2.0 and OpenAPI 3.0.1 - all are optional.
-
-Name | Description | Default value
----- | ----------- | -------------
-title | The title of the application. Used for the `title` attribute in the [Info object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#info-object) | `API documentation`
-description | A description of the application. Used for the `description` attribute in the [Info object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#info-object) | empty
-version | The version of the api. Used for the `version` attribute in the [Info object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#info-object) | project version
-format | The format of the output OpenAPI file - supported values are `json` and `yaml` | `json`
-tagDescriptionsPropertiesFile | A yaml file mapping tag names to descriptions. These are populated into the top level ` [Tags attribute](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#tag-object) | no default - if not provided no tags created.
-oauth2SecuritySchemeDefinition | Closure containing information to generate the [securityDefinitions](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#securityDefinitionsObject) object in the `OpenAPI` specification. | empty
-oauth2SecuritySchemeDefinition.flows | The Oauth2 flows the API supports. Use valid values from the [securityDefinitions](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#securityDefinitionsObject) specification. | no default - required if `oauth2SecuritySchemeDefinition` is set.
-oauth2SecuritySchemeDefinition.tokenUrl | The Oauth2 tokenUrl | no default - required for the flows `password`, `application`, `accessCode`.
-oauth2SecuritySchemeDefinition.authorizationUrl | The Oauth2 authorizationUrl | no default - required for the flows `implicit`, `accessCode`.
-oauth2SecuritySchemeDefinition.scopeDescriptionsPropertiesFile | A yaml file mapping scope names to descriptions. These are used in the `securityDefinitions` as the [scope description](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#scopesObject) | no default - if not provided the scope descriptions default to `No description`.
-
-
-The `scopeDescriptionsPropertiesFile` is supposed to be a yaml file:
-```yaml
-scope-name: A description
-```
-#### OpenAPI 2.0
-
-The `restdocs-api-spec-gradle-plugin` takes the following configuration options for OpenAPI 2.0 - all are optional.
-
-Name | Description | Default value
----- | ----------- | -------------
-host | The host serving the API - corresponds to the attribute with the same name in the [OpenAPI root object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#swagger-object)| `localhost`
-basePath | The base path on which the API is served - corresponds to the attribute with the same name in the [OpenAPI root object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#swagger-object) | null
-schemes | The supported transfer protocols of the API - corresponds to the attribute with the same name in the [OpenAPI root object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#swagger-object) | `['http'"]`
-outputFileNamePrefix | The file name prefix of the output file. | `openapi` which results in e.g. `openapi.json` for the format `json`
-
-Example configuration closure:
-```
-openapi {
-    basePath = "/api"
-    host = "api-shop.beyondshop.cloud"
-    schemes = ["https"]
-    format = "yaml"
-    title = 'Beyond REST API'
-    version = "1.0.0"
-    separatePublicApi = true
-    snippetsDirectory="src/docs/asciidoc/generated-snippets/"
-    outputDirectory="openapi/"
-    oauth2SecuritySchemeDefinition = {
-        flows = ['accessCode', 'application']
-        tokenUrl = 'https://api-shop.beyondshop.cloud/api/oauth/token'
-        authorizationUrl = 'https://api-shop.beyondshop.cloud/api/auth/oauth-ext/authorize'
-        scopeDescriptionsPropertiesFile = "src/docs/scope-descriptions.yaml"
-    }
-}
-```
-
-#### OpenAPI 3.0.1
-
-The `restdocs-api-spec-gradle-plugin` takes the following configuration options for OpenAPI 3.0.1 - all are optional.
-
-Name | Description | Default value
----- | ----------- | -------------
-outputFileNamePrefix | The file name prefix of the output file. | `openapi3` which results in e.g. `openapi3.json` for the format `json`
-servers | Specifies the servers the API is available from. Use this property to specify multiple server definitions. See example below.  | `http://localhost`
-server | Specifies the servers the API is available from. Use this property to specify just a single server definition. See example below | `http://localhost`
-
-Example configuration closure:
-```
-openapi3 {
-    servers = [ { url = "http://some.api" } ]
-    title = 'My API title'
-    version = '1.0.1'
-    format = 'yaml'
-    contact = {
-        name = 'John Doe'
-        email = 'john.doe@example.com'
-    }
-    separatePublicApi = true
-    outputFileNamePrefix = 'my-api-spec'
-    oauth2SecuritySchemeDefinition = {
-        flows = ['authorizationCode']
-        tokenUrl = 'http://example.com/token'
-        authorizationUrl = 'http://example.com/authorize'
-        scopeDescriptionsPropertiesFile = "scopeDescriptions.yaml"
-    }
-}
-```
-
-Example `build.gradle.kts` configuration closure (by [axkb](https://github.com/axkb), [#112](https://github.com/ePages-de/restdocs-api-spec/issues/112)):
-```
-configure<com.epages.restdocs.apispec.gradle.OpenApi3Extension> {
-    setServer("http://$apiHost:$apiPort")
-    title = "Your title"
-    description = "Your description"
-    version = "0.1.0"
-    format = "json"
-    tagDescriptionsPropertiesFile = "src/test/resources/tags.yaml"
-}
-```
-
-The `servers` and `server` property can also contain variables. Is this case the` property can be specified like this:
-
-This configuration follows the same semantics as the ['Servers Object'](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#server-object) in the OpenAPI specification
+[redoc](https://github.com/Rebilly/ReDoc)으로 OpenAPI 명세를 HTML로 변환할 수 있습니다.
 
 ```
-servers = [ {
-    url = 'https://{host}/api'
-    variables = [
-        host: [
-            default: 'api-shop.beyondshop.cloud/api',
-            description: 'The hostname of your beyond shop',
-            enum: ['api-shop', 'oz']
-        ]
-    ]
-} ]
-```
-
-The same structure applies to `server`.
-A single server can also be specified using a plain string:
-
-```
-server = 'http://some.api/api'
-```
-
-#### Postman
-
-The `restdocs-api-spec-gradle-plugin` takes the following configuration options for Postman collections - all are optional.
-
-Name | Description | Default value
----- | ----------- | -------------
-title | The title of the application. Used for the `name` attribute of the `Information` object of the collection | `API documentation`
-version | The version of the api. Used for the `version` attribute in the `Information` object | project version if specified - otherwise `1.0.0`
-baseUrl | The baseUrl of the application. e.g. `https://myapi.example.com:8080/api` | `http://localhost`
-
-Example configuration closure:
-```
-postman {
-    title = 'Beyond REST API'
-    version = '1.0.1'
-    baseUrl = 'https://api-shop.beyondshop.cloud/api'
-    separatePublicApi = true
-    outputFileNamePrefix = 'my-postman-collection'
-}
-```
-
-## Generate an HTML-based API reference from OpenAPI
-
-We can use [redoc](https://github.com/Rebilly/ReDoc) to generate an HTML API reference from our OpenAPI specification.
-
-The [redoc-cli](https://www.npmjs.com/package/redoc-cli) can be used to bundle (and serve) this API reference:
-```
-# Install redoc-cli
+# redoc-cli 설치
 npm install -g redoc-cli
 
-# Bundle the documentation into a zero-dependency HTML-file
+# HTML 파일로 번들링
 redoc-cli bundle build/api-spec/openapi.json
 
-# Bundle and serve
+# 서버에서 문서 확인
 redoc-cli serve build/api-spec/openapi.json
 ```
 
-## Maintenance
+## 유지보수
 
-This section of the README is targeted at project maintainers.
+### 프로젝트 배포
 
-### Publish project
+이 프로젝트는 [GitHub Actions](./.github/workflows)로 배포됩니다.  
+버전 관리는 Git 태그로 합니다([allegro/axion-release-plugin](https://axion-release-plugin.readthedocs.io) 참고).  
+Java 라이브러리는 Sonatype에, Gradle 플러그인은 Gradle Plugin Portal에 배포됩니다.
 
-The project is published with the help of [GitHub Actions](./.github/workflows).
-It's version number is determined by the Git tags (see [allegro/axion-release-plugin](https://axion-release-plugin.readthedocs.io)).
-The Java dependencies are published to Sonatype with the help of the [gradle-nexus/publish-plugin](https://github.com/gradle-nexus/publish-plugin) and the Maven Publish Plugin.
-The Gradle plugin is published to the [Gradle plugin portal](https://plugins.gradle.org/plugin/com.epages.restdocs-api-spec) with the help of the ['plugin-publish' plugin](https://plugins.gradle.org/plugin/com.gradle.plugin-publish) (see [docs.gradle.org](https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html)).
-
-Given that the `master` branch on the upstream repository is in the state from which you want to create a release, execute the following steps:
-
-**(1) Create release**
-
-[Create release via the GitHub UI](https://github.com/ePages-de/restdocs-api-spec/releases/new).
-
-Use the intended version number as "Tag version", e.g. "0.18.2".
-This will automatically trigger a GitHub Action build which publishes the JAR files for this release to Sonatype.
-
-**(2) Login to Sonatype**
-
-Login to Sonatype and navigate to the [staging repositories](https://oss.sonatype.org/#stagingRepositories).
-
-**(3) Close the staging repository**
-    
-Select the generated staging repository and close it.
-Check that there are no errors afterwards (e.g. missing signatures or Javadoc JARs).
-
-**(4) Release the repository**
-
-Select the generated staging repository and release it.
-After few minutes, the release should be available in the ["Public Repositories" of ePages](https://oss.sonatype.org/service/local/repo_groups/public/content/com/epages/).
-
-**(5) Update documentation**
-
-Create a new commit which updates the version numbers in the `README` file.
+배포 방법 요약:
+1. GitHub UI에서 릴리즈 생성(태그 예: 0.18.2)
+2. Sonatype 로그인, Staging Repository 이동
+3. 생성된 Staging Repository를 닫고 오류 확인
+4. Staging Repository를 Release 처리
+5. README의 버전 정보 업데이트 후 커밋
